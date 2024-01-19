@@ -3,6 +3,7 @@ package startMenu
 import (
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
+	"skrive.vanu.dev/log"
 )
 
 type StartMenuModel struct {
@@ -25,7 +26,7 @@ func getModelPlaceHolder(returnToStart func() tea.Model) tea.Model { return retu
 var menuItems = []MenuItem{
 	{
 		name:     "Log a dose",
-		getModel: getModelPlaceHolder,
+		getModel: log.InitializeModel,
 	},
 	{
 		name:     "View logs",
