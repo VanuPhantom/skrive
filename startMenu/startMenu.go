@@ -11,7 +11,7 @@ type StartMenuModel struct {
 
 type MenuItem struct {
 	name     string
-	getModel func() tea.Model
+	getModel func(func() tea.Model) tea.Model
 }
 
 func InitializeModel() tea.Model {
@@ -20,18 +20,20 @@ func InitializeModel() tea.Model {
 	}
 }
 
+func getModelPlaceHolder(returnToStart func() tea.Model) tea.Model { return returnToStart() }
+
 var menuItems = []MenuItem{
 	{
 		name:     "Log a dose",
-		getModel: InitializeModel,
+		getModel: getModelPlaceHolder,
 	},
 	{
 		name:     "View logs",
-		getModel: InitializeModel,
+		getModel: getModelPlaceHolder,
 	},
 	{
 		name:     "About",
-		getModel: InitializeModel,
+		getModel: getModelPlaceHolder,
 	},
 }
 
@@ -45,19 +47,16 @@ func (m StartMenuModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		switch msg.String() {
 		case "ctrl+c", "q":
 			return m, tea.Quit
-		default:
-			switch msg.String() {
-			case "up", "k":
-				if m.cursor > 0 {
-					m.cursor -= 1
-				}
-			case "down", "j":
-				if m.cursor < len(menuItems)-1 {
-					m.cursor += 1
-				}
-			case "enter":
-				return menuItems[m.cursor].getModel(), nil
+		case "up", "k":
+			if m.cursor > 0 {
+				m.cursor -= 1
 			}
+		case "down", "j":
+			if m.cursor < len(menuItems)-1 {
+				m.cursor += 1
+			}
+		case "enter":
+			return menuItems[m.cursor].getModel(InitializeModel), nil
 		}
 	}
 
