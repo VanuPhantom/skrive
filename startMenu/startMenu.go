@@ -1,9 +1,8 @@
 package startMenu
 
 import (
-	"fmt"
-
 	tea "github.com/charmbracelet/bubbletea"
+	"github.com/charmbracelet/lipgloss"
 )
 
 type StartMenuModel struct {
@@ -62,17 +61,17 @@ func (m StartMenuModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 }
 
 func (m StartMenuModel) View() string {
-	s := "-= Skrive =-\n\n"
+	header := renderHeader()
+	list := ""
 
 	for i, item := range menuItems {
-		cursor := " "
-
-		if m.cursor == i {
-			cursor = ">"
+		if i > 0 {
+			list += "\n"
 		}
-
-		s += fmt.Sprintf("%s %s\n", cursor, item.name)
+		list += renderListItem(item.name, m.cursor == i)
 	}
 
-	return s
+	list = listStyle.Render(list)
+
+	return lipgloss.JoinHorizontal(lipgloss.Center, header, list)
 }
