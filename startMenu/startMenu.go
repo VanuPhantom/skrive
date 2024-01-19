@@ -10,12 +10,26 @@ type StartMenuModel struct {
 	cursor int
 }
 
-var menuItems = []string{"Log a dose", "View logs"}
+type MenuItem struct {
+	name     string
+	getModel func() tea.Model
+}
 
-func InitializeModel() StartMenuModel {
+func InitializeModel() tea.Model {
 	return StartMenuModel{
 		cursor: 0,
 	}
+}
+
+var menuItems = []MenuItem{
+	{
+		name:     "Log a dose",
+		getModel: InitializeModel,
+	},
+	{
+		name:     "View logs",
+		getModel: InitializeModel,
+	},
 }
 
 func (m StartMenuModel) Init() tea.Cmd {
@@ -38,6 +52,8 @@ func (m StartMenuModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				if m.cursor < len(menuItems)-1 {
 					m.cursor += 1
 				}
+			case "enter":
+				return menuItems[m.cursor].getModel(), nil
 			}
 		}
 	}
@@ -48,14 +64,14 @@ func (m StartMenuModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 func (m StartMenuModel) View() string {
 	s := "-= Skrive =-\n\n"
 
-	for i, choice := range menuItems {
+	for i, item := range menuItems {
 		cursor := " "
 
 		if m.cursor == i {
 			cursor = ">"
 		}
 
-		s += fmt.Sprintf("%s %s\n", cursor, choice)
+		s += fmt.Sprintf("%s %s\n", cursor, item.name)
 	}
 
 	return s
