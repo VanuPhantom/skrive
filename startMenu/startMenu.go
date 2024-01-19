@@ -29,6 +29,10 @@ var menuItems = []MenuItem{
 		name:     "View logs",
 		getModel: InitializeModel,
 	},
+	{
+		name:     "About",
+		getModel: InitializeModel,
+	},
 }
 
 func (m StartMenuModel) Init() tea.Cmd {
