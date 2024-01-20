@@ -66,24 +66,45 @@ func (m model) Init() tea.Cmd {
 	return textinput.Blink
 }
 
+func (m model) updateAfterFocusChange() (tea.Model, tea.Cmd) {
+	cmds := make([]tea.Cmd, 3)
+
+	for i := range m.inputs {
+		if i == m.activeInputIndex {
+			cmds[i] = m.inputs[i].Focus()
+			continue
+		}
+
+		m.inputs[i].Blur()
+	}
+
+	return m, tea.Batch(cmds...)
+}
+
+func (m model) focusNext(allowEntry bool) (tea.Model, tea.Cmd) {
+	if !allowEntry && m.activeInputIndex < 0 {
+		return m, nil
+	}
+
+	m.activeInputIndex++
+
+	if m.activeInputIndex >= len(m.inputs) {
+		m.activeInputIndex = 0
+	}
+
+	return m.updateAfterFocusChange()
+}
+
 func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	switch msg := msg.(type) {
 	case tea.KeyMsg:
 		switch msg.String() {
 		case "ctrl+c":
 			return m, tea.Quit
+		case "enter":
+			return m.focusNext(false)
 		case "tab":
-			if m.activeInputIndex >= 0 {
-				m.inputs[m.activeInputIndex].Blur()
-			}
-
-			m.activeInputIndex++
-
-			if m.activeInputIndex >= len(m.inputs) {
-				m.activeInputIndex = 0
-			}
-
-			m.inputs[m.activeInputIndex].Focus()
+			return m.focusNext(true)
 		default:
 			if m.activeInputIndex == -1 {
 				switch msg.String() {
@@ -93,9 +114,8 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			} else {
 				switch msg.String() {
 				case "esc":
-					m.inputs[m.activeInputIndex].Blur()
-
 					m.activeInputIndex = -1
+					return m.updateAfterFocusChange()
 				}
 			}
 		}
