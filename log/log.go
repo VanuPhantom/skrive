@@ -95,6 +95,16 @@ func (m model) focusNext(allowEntry bool) (tea.Model, tea.Cmd) {
 	return m.updateAfterFocusChange()
 }
 
+func (m model) focusPrevious() (tea.Model, tea.Cmd) {
+	m.activeInputIndex--
+
+	if m.activeInputIndex < 0 {
+		m.activeInputIndex = len(m.inputs) - 1
+	}
+
+	return m.updateAfterFocusChange()
+}
+
 func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	switch msg := msg.(type) {
 	case tea.KeyMsg:
@@ -105,6 +115,8 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			return m.focusNext(false)
 		case "tab":
 			return m.focusNext(true)
+		case "shift+tab":
+			return m.focusPrevious()
 		default:
 			if m.activeInputIndex == -1 {
 				switch msg.String() {
