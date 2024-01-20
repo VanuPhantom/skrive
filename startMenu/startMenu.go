@@ -3,6 +3,7 @@ package startMenu
 import (
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
+	"skrive.vanu.dev/about"
 	"skrive.vanu.dev/log"
 )
 
@@ -34,7 +35,7 @@ var menuItems = []MenuItem{
 	},
 	{
 		name:     "About",
-		getModel: getModelPlaceHolder,
+		getModel: about.InitializeModel,
 	},
 }
 
