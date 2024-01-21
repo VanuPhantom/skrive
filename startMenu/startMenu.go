@@ -5,6 +5,7 @@ import (
 	"github.com/charmbracelet/lipgloss"
 	"skrive.vanu.dev/about"
 	"skrive.vanu.dev/log"
+	"skrive.vanu.dev/view"
 )
 
 type StartMenuModel struct {
@@ -13,7 +14,7 @@ type StartMenuModel struct {
 
 type MenuItem struct {
 	name     string
-	getModel func(func() tea.Model) tea.Model
+	getModel func(func() tea.Model) (tea.Model, tea.Cmd)
 }
 
 func InitializeModel() tea.Model {
@@ -31,7 +32,7 @@ var menuItems = []MenuItem{
 	},
 	{
 		name:     "View logs",
-		getModel: getModelPlaceHolder,
+		getModel: view.InitializeModel,
 	},
 	{
 		name:     "About",
@@ -58,7 +59,7 @@ func (m StartMenuModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				m.cursor += 1
 			}
 		case "enter":
-			return menuItems[m.cursor].getModel(InitializeModel), nil
+			return menuItems[m.cursor].getModel(InitializeModel)
 		}
 	}
 

@@ -12,10 +12,12 @@ type model struct {
 	returnToStart func() tea.Model
 }
 
-func InitializeModel(returnToStart func() tea.Model) tea.Model {
-	return model{
+func InitializeModel(returnToStart func() tea.Model) (tea.Model, tea.Cmd) {
+	model := model{
 		returnToStart,
 	}
+
+	return model, model.Init()
 }
 
 func (m model) Init() tea.Cmd {

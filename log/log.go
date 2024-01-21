@@ -40,7 +40,7 @@ const (
 	ROUTE_INDEX
 )
 
-func InitializeModel(returnToStart func() tea.Model) tea.Model {
+func InitializeModel(returnToStart func() tea.Model) (tea.Model, tea.Cmd) {
 	var activeInputIndex int
 
 	inputs := make([]textinput.Model, 3)
@@ -55,11 +55,13 @@ func InitializeModel(returnToStart func() tea.Model) tea.Model {
 
 	inputs[0].Focus()
 
-	return model{
+	model := model{
 		activeInputIndex,
 		inputs,
 		returnToStart,
 	}
+
+	return model, model.Init()
 }
 
 func (m model) Init() tea.Cmd {

@@ -27,3 +27,14 @@ func (d Dose) Log() error {
 
 	return nil
 }
+
+func Load() ([]Dose, error) {
+	if bytes, err := os.ReadFile("doses.dat"); err != nil {
+		return nil, err
+	} else {
+
+		raw := string(bytes)
+
+		return decode(raw)
+	}
+}
