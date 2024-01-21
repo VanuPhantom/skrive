@@ -1,7 +1,6 @@
 package logic
 
 import (
-	"fmt"
 	"os"
 )
 
@@ -9,11 +8,6 @@ type Dose struct {
 	Quantity  string
 	Substance string
 	Route     string
-}
-
-func (d Dose) encode() string {
-	// TODO: Add escaping
-	return fmt.Sprintf("%s;%s;%s;", d.Quantity, d.Substance, d.Route)
 }
 
 func (d Dose) Log() error {
