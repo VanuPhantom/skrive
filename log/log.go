@@ -35,7 +35,7 @@ var fields = [3]field{
 }
 
 const (
-	DOSE_INDEX int = iota
+	QUANTITY_INDEX int = iota
 	SUBSTANCE_INDEX
 	ROUTE_INDEX
 )
@@ -105,6 +105,10 @@ func (m model) focusPrevious() (tea.Model, tea.Cmd) {
 	return m.updateAfterFocusChange()
 }
 
+func (m model) getValue(index int) string {
+	return m.inputs[index].Value()
+}
+
 func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	switch msg := msg.(type) {
 	case tea.KeyMsg:
@@ -112,6 +116,14 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		case "ctrl+c":
 			return m, tea.Quit
 		case "enter":
+			if m.activeInputIndex == len(m.inputs)-1 {
+				return m, log(
+					m.getValue(QUANTITY_INDEX),
+					m.getValue(SUBSTANCE_INDEX),
+					m.getValue(ROUTE_INDEX),
+				)
+			}
+
 			return m.focusNext(false)
 		case "tab":
 			return m.focusNext(true)
@@ -130,6 +142,13 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 					return m.updateAfterFocusChange()
 				}
 			}
+		}
+	case logMsg:
+		if msg.success {
+			return m.returnToStart(), nil
+		} else {
+			// TODO: Display errors
+			return m, nil
 		}
 	}
 
