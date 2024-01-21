@@ -2,9 +2,11 @@ package logic
 
 import (
 	"os"
+	"time"
 )
 
 type Dose struct {
+	Time      time.Time
 	Quantity  string
 	Substance string
 	Route     string

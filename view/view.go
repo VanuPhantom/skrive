@@ -44,15 +44,17 @@ func (m model) Init() tea.Cmd {
 
 func createTable(doses []logic.Dose) table.Model {
 	columns := []table.Column{
+		{Title: "Time", Width: 20},
 		{Title: "Amount", Width: 15},
-		{Title: "Substance", Width: 30},
-		{Title: "Route", Width: 30},
+		{Title: "Substance", Width: 25},
+		{Title: "Route", Width: 25},
 	}
 
 	rows := make([]table.Row, len(doses))
 
 	for i, dose := range doses {
 		rows[i] = table.Row{
+			dose.Time.Local().Format("2006-01-02 15:04:05"),
 			dose.Quantity,
 			dose.Substance,
 			dose.Route,
