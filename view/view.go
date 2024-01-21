@@ -94,12 +94,6 @@ func (m model) View() string {
 	if m.err != nil {
 		return m.err.Error()
 	} else if m.doses != nil {
-		//result := ""
-
-		//for _, dose := range m.doses {
-		//	result += fmt.Sprintf("- %s - %s - %s\n", dose.Quantity, dose.Substance, dose.Route)
-		//}
-
 		return m.doseTable.View()
 	} else {
 		return fmt.Sprintf("%s Loading", m.loadingIndicator.View())
