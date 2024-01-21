@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"github.com/charmbracelet/bubbles/spinner"
+	"github.com/charmbracelet/bubbles/table"
 	tea "github.com/charmbracelet/bubbletea"
 	"skrive.vanu.dev/logic"
 )
@@ -14,11 +15,14 @@ type model struct {
 	err           error
 
 	loadingIndicator spinner.Model
+	doseTable        table.Model
 }
 
 func InitializeModel(returnToStart func() tea.Model) (tea.Model, tea.Cmd) {
 	loadingIndicator := spinner.New()
 	loadingIndicator.Spinner = spinner.Dot
+
+	doseTable := createTable(make([]logic.Dose, 0))
 
 	var doses []logic.Dose = nil
 	var err error = nil
@@ -28,6 +32,7 @@ func InitializeModel(returnToStart func() tea.Model) (tea.Model, tea.Cmd) {
 		doses,
 		err,
 		loadingIndicator,
+		doseTable,
 	}
 
 	return model, model.Init()
@@ -35,6 +40,31 @@ func InitializeModel(returnToStart func() tea.Model) (tea.Model, tea.Cmd) {
 
 func (m model) Init() tea.Cmd {
 	return tea.Batch(load, m.loadingIndicator.Tick)
+}
+
+func createTable(doses []logic.Dose) table.Model {
+	columns := []table.Column{
+		{Title: "Amount", Width: 15},
+		{Title: "Substance", Width: 30},
+		{Title: "Route", Width: 30},
+	}
+
+	rows := make([]table.Row, len(doses))
+
+	for i, dose := range doses {
+		rows[i] = table.Row{
+			dose.Quantity,
+			dose.Substance,
+			dose.Route,
+		}
+	}
+
+	return table.New(
+		table.WithColumns(columns),
+		table.WithRows(rows),
+		table.WithFocused(true),
+		table.WithHeight(10),
+	)
 }
 
 func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
@@ -48,27 +78,29 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		}
 	case successfulLoadMsg:
 		m.doses = msg.doses
+		m.doseTable = createTable(msg.doses)
 	case failedLoadMsg:
 		m.err = msg.err
 	}
 
-	var cmd tea.Cmd
-	m.loadingIndicator, cmd = m.loadingIndicator.Update(msg)
+	cmds := make([]tea.Cmd, 2)
+	m.loadingIndicator, cmds[0] = m.loadingIndicator.Update(msg)
+	m.doseTable, cmds[1] = m.doseTable.Update(msg)
 
-	return m, cmd
+	return m, tea.Batch(cmds...)
 }
 
 func (m model) View() string {
 	if m.err != nil {
 		return m.err.Error()
 	} else if m.doses != nil {
-		result := ""
+		//result := ""
 
-		for _, dose := range m.doses {
-			result += fmt.Sprintf("- %s - %s - %s\n", dose.Quantity, dose.Substance, dose.Route)
-		}
+		//for _, dose := range m.doses {
+		//	result += fmt.Sprintf("- %s - %s - %s\n", dose.Quantity, dose.Substance, dose.Route)
+		//}
 
-		return result
+		return m.doseTable.View()
 	} else {
 		return fmt.Sprintf("%s Loading", m.loadingIndicator.View())
 	}
