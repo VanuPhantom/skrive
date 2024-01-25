@@ -2,8 +2,10 @@ package main
 
 import (
 	"fmt"
+	"log"
 	"os"
 
+	"skrive.vanu.dev/logic"
 	"skrive.vanu.dev/startMenu"
 
 	tea "github.com/charmbracelet/bubbletea"
@@ -17,6 +19,15 @@ func main() {
 			os.Exit(1)
 		}
 		defer f.Close()
+	}
+
+	if len(os.Args) >= 2 {
+		logic.Path = os.Args[1]
+	} else {
+		err := os.MkdirAll("/opt/homebrew/var/skrive", os.ModePerm)
+		if err != nil {
+			log.Println(err.Error)
+		}
 	}
 
 	program := tea.NewProgram(startMenu.InitializeModel())

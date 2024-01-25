@@ -1,6 +1,7 @@
 package logic
 
 import (
+	"log"
 	"os"
 	"time"
 )
@@ -12,10 +13,13 @@ type Dose struct {
 	Route     string
 }
 
+var Path = "/opt/homebrew/var/skrive/doses.dat"
+
 func (d Dose) Log() error {
-	file, err := os.OpenFile("doses.dat", os.O_APPEND|os.O_WRONLY|os.O_CREATE, 0600)
+	file, err := os.OpenFile(Path, os.O_APPEND|os.O_WRONLY|os.O_CREATE, 0600)
 
 	if err != nil {
+		log.Println(err.Error())
 		return err
 	}
 
@@ -31,7 +35,7 @@ func (d Dose) Log() error {
 }
 
 func Load() ([]Dose, error) {
-	if bytes, err := os.ReadFile("doses.dat"); err != nil {
+	if bytes, err := os.ReadFile(Path); err != nil {
 		return nil, err
 	} else {
 
