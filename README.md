@@ -1,2 +1,2 @@
 # Skrive
-Secure and sleek logging.
+Secure and sleek dosage logging for the terminal.
