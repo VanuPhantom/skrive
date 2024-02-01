@@ -14,7 +14,7 @@ type StartMenuModel struct {
 
 type MenuItem struct {
 	name     string
-	getModel func(func() tea.Model) (tea.Model, tea.Cmd)
+	getModel func(func() (tea.Model, tea.Cmd)) (tea.Model, tea.Cmd)
 }
 
 func InitializeModel() tea.Model {
@@ -59,7 +59,12 @@ func (m StartMenuModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				m.cursor += 1
 			}
 		case "enter":
-			return menuItems[m.cursor].getModel(InitializeModel)
+			return menuItems[m.cursor].getModel(
+				func() (tea.Model, tea.Cmd) {
+					m2 := InitializeModel()
+
+					return m2, m2.Init()
+				})
 		}
 	}
 

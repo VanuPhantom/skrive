@@ -9,10 +9,10 @@ var red = lipgloss.NewStyle().Background(lipgloss.Color("#C8102E"))
 var white = lipgloss.NewStyle().Background(lipgloss.Color("#FFFFFF"))
 
 type model struct {
-	returnToStart func() tea.Model
+	returnToStart func() (tea.Model, tea.Cmd)
 }
 
-func InitializeModel(returnToStart func() tea.Model) (tea.Model, tea.Cmd) {
+func InitializeModel(returnToStart func() (tea.Model, tea.Cmd)) (tea.Model, tea.Cmd) {
 	model := model{
 		returnToStart,
 	}
@@ -31,7 +31,7 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		case "ctrl+c":
 			return m, tea.Quit
 		case "q", "esc":
-			return m.returnToStart(), nil
+			return m.returnToStart()
 		}
 	}
 

@@ -11,7 +11,7 @@ import (
 type model struct {
 	activeInputIndex int
 	inputs           []textinput.Model
-	returnToStart    func() tea.Model
+	returnToStart    func() (tea.Model, tea.Cmd)
 }
 
 type field struct {
@@ -40,7 +40,7 @@ const (
 	ROUTE_INDEX
 )
 
-func InitializeModel(returnToStart func() tea.Model) (tea.Model, tea.Cmd) {
+func InitializeModel(returnToStart func() (tea.Model, tea.Cmd)) (tea.Model, tea.Cmd) {
 	var activeInputIndex int
 
 	inputs := make([]textinput.Model, 3)
@@ -135,7 +135,7 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			if m.activeInputIndex == -1 {
 				switch msg.String() {
 				case "q", "esc":
-					return m.returnToStart(), nil
+					return m.returnToStart()
 				}
 			} else {
 				switch msg.String() {
@@ -147,7 +147,7 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		}
 	case logMsg:
 		if msg.success {
-			return m.returnToStart(), nil
+			return m.returnToStart()
 		} else {
 			// TODO: Display errors
 			return m, nil
