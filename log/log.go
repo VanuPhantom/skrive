@@ -184,7 +184,7 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				return m.updateAfterFocusChange()
 			}
 		default:
-			if m.activeInputIndex == -1 {
+			if m.activeInputIndex == -1 || m.activeAreaIndex > 0 {
 				switch msg.String() {
 				case "q", "esc":
 					return m.returnToStart()
