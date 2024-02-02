@@ -169,10 +169,10 @@ var inputStyle = lipgloss.NewStyle().
 	Width(25).Align(lipgloss.Center)
 
 func (m model) View() string {
-	renderedFields := make([]string, len(fields))
+	renderedFields := ""
 	for i := 0; i < len(fields); i++ {
-		renderedFields[i] = inputStyle.Render(m.inputs[i].View())
+		renderedFields = lipgloss.JoinHorizontal(lipgloss.Top, renderedFields, inputStyle.Render(m.inputs[i].View()))
 	}
 
-	return lipgloss.JoinHorizontal(lipgloss.Top, renderedFields...)
+	return renderedFields
 }
