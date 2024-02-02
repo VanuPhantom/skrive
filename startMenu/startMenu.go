@@ -1,11 +1,12 @@
 package startMenu
 
 import (
+	"skrive/about"
+	"skrive/log"
+	"skrive/view"
+
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
-	"skrive.vanu.dev/about"
-	"skrive.vanu.dev/log"
-	"skrive.vanu.dev/view"
 )
 
 type StartMenuModel struct {

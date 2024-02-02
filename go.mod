@@ -1,4 +1,4 @@
-module skrive.vanu.dev
+module skrive
 
 go 1.21.6
 

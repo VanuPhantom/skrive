@@ -5,8 +5,8 @@ import (
 	"os"
 	"path"
 
-	"skrive.vanu.dev/logic"
-	"skrive.vanu.dev/startMenu"
+	"skrive/logic"
+	"skrive/startMenu"
 
 	tea "github.com/charmbracelet/bubbletea"
 )

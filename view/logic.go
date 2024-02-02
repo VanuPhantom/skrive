@@ -1,8 +1,9 @@
 package view
 
 import (
+	"skrive/logic"
+
 	tea "github.com/charmbracelet/bubbletea"
-	"skrive.vanu.dev/logic"
 )
 
 type successfulLoadMsg struct {

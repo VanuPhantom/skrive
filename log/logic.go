@@ -3,8 +3,9 @@ package log
 import (
 	"time"
 
+	"skrive/logic"
+
 	tea "github.com/charmbracelet/bubbletea"
-	"skrive.vanu.dev/logic"
 )
 
 type logMsg struct {

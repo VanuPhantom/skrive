@@ -3,10 +3,11 @@ package view
 import (
 	"fmt"
 
+	"skrive/logic"
+
 	"github.com/charmbracelet/bubbles/spinner"
 	"github.com/charmbracelet/bubbles/table"
 	tea "github.com/charmbracelet/bubbletea"
-	"skrive.vanu.dev/logic"
 )
 
 type model struct {
