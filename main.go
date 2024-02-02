@@ -2,8 +2,8 @@ package main
 
 import (
 	"fmt"
-	"log"
 	"os"
+	"path"
 
 	"skrive.vanu.dev/logic"
 	"skrive.vanu.dev/startMenu"
@@ -24,9 +24,9 @@ func main() {
 	if len(os.Args) >= 2 {
 		logic.Path = os.Args[1]
 	} else {
-		err := os.MkdirAll("/opt/homebrew/var/skrive", os.ModePerm)
-		if err != nil {
-			log.Println(err.Error)
+		dirname, err := os.UserHomeDir()
+		if err == nil {
+			logic.Path = path.Join(dirname, "doses.dat")
 		}
 	}
 
