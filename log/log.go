@@ -10,6 +10,7 @@ import (
 
 type model struct {
 	activeInputIndex int
+	activeAreaIndex  int
 	inputs           []textinput.Model
 	returnToStart    func() (tea.Model, tea.Cmd)
 }
@@ -34,6 +35,11 @@ var fields = [3]field{
 	},
 }
 
+var buttons = [2]string{
+	"Log dose",
+	"Backdate dose",
+}
+
 const (
 	QUANTITY_INDEX int = iota
 	SUBSTANCE_INDEX
@@ -41,7 +47,10 @@ const (
 )
 
 func InitializeModel(returnToStart func() (tea.Model, tea.Cmd)) (tea.Model, tea.Cmd) {
-	var activeInputIndex int
+	var (
+		activeInputIndex int
+		activeAreaIndex  int
+	)
 
 	inputs := make([]textinput.Model, 3)
 
@@ -57,6 +66,7 @@ func InitializeModel(returnToStart func() (tea.Model, tea.Cmd)) (tea.Model, tea.
 
 	model := model{
 		activeInputIndex,
+		activeAreaIndex,
 		inputs,
 		returnToStart,
 	}
@@ -72,7 +82,7 @@ func (m model) updateAfterFocusChange() (tea.Model, tea.Cmd) {
 	cmds := make([]tea.Cmd, 3)
 
 	for i := range m.inputs {
-		if i == m.activeInputIndex {
+		if m.activeAreaIndex == 0 && i == m.activeInputIndex {
 			cmds[i] = m.inputs[i].Focus()
 			continue
 		}
@@ -88,20 +98,30 @@ func (m model) focusNext(allowEntry bool) (tea.Model, tea.Cmd) {
 		return m, nil
 	}
 
-	m.activeInputIndex++
+	if m.activeInputIndex == len(m.inputs)-1 {
+		m.activeAreaIndex++
 
-	if m.activeInputIndex >= len(m.inputs) {
-		m.activeInputIndex = 0
+		if m.activeAreaIndex >= len(buttons)+1 {
+			m.activeInputIndex = 0
+			m.activeAreaIndex = 0
+		}
+	} else {
+		m.activeInputIndex++
 	}
 
 	return m.updateAfterFocusChange()
 }
 
 func (m model) focusPrevious() (tea.Model, tea.Cmd) {
-	m.activeInputIndex--
+	if m.activeAreaIndex == 0 {
+		m.activeInputIndex--
 
-	if m.activeInputIndex < 0 {
-		m.activeInputIndex = len(m.inputs) - 1
+		if m.activeInputIndex < 0 {
+			m.activeInputIndex = len(m.inputs) - 1
+			m.activeAreaIndex = len(buttons)
+		}
+	} else {
+		m.activeAreaIndex--
 	}
 
 	return m.updateAfterFocusChange()
@@ -118,26 +138,58 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		case "ctrl+c":
 			return m, tea.Quit
 		case "enter":
-			if m.activeInputIndex == len(m.inputs)-1 {
+			if m.activeAreaIndex == 1 {
 				return m, log(
 					m.getValue(QUANTITY_INDEX),
 					m.getValue(SUBSTANCE_INDEX),
 					m.getValue(ROUTE_INDEX),
 				)
+			} else if m.activeAreaIndex == 2 {
+				// TODO: DO SOMETHING COOL
+			} else {
+				return m.focusNext(false)
 			}
-
-			return m.focusNext(false)
 		case "tab":
 			return m.focusNext(true)
 		case "shift+tab":
 			return m.focusPrevious()
+		case "left":
+			if m.activeAreaIndex == 0 {
+				m.activeInputIndex--
+
+				if m.activeInputIndex < 0 {
+					m.activeInputIndex = len(m.inputs) - 1
+				}
+
+				return m.updateAfterFocusChange()
+			}
+		case "right":
+			if m.activeAreaIndex == 0 {
+				m.activeInputIndex++
+
+				if m.activeInputIndex >= len(m.inputs) {
+					m.activeInputIndex = 0
+				}
+
+				return m.updateAfterFocusChange()
+			}
+		case "down":
+			if m.activeAreaIndex < len(buttons) {
+				m.activeAreaIndex++
+				return m.updateAfterFocusChange()
+			}
+		case "up":
+			if m.activeAreaIndex > 0 {
+				m.activeAreaIndex--
+				return m.updateAfterFocusChange()
+			}
 		default:
 			if m.activeInputIndex == -1 {
 				switch msg.String() {
 				case "q", "esc":
 					return m.returnToStart()
 				}
-			} else {
+			} else if m.activeAreaIndex == 0 {
 				switch msg.String() {
 				case "esc":
 					m.activeInputIndex = -1
@@ -168,11 +220,30 @@ var inputStyle = lipgloss.NewStyle().
 	Border(lipgloss.ThickBorder()).
 	Width(25).Align(lipgloss.Center)
 
+var unhighlitButtonStyle = lipgloss.NewStyle().
+	Padding(0, 1).Margin(0, 0, 1).
+	Width(21)
+
+var highlitButtonStyle = unhighlitButtonStyle.Copy().
+	Foreground(lipgloss.Color("#000000")).
+	Background(lipgloss.Color("#FFFFFF"))
+
+func buttonStyle(highlit bool) lipgloss.Style {
+	if highlit {
+		return highlitButtonStyle
+	} else {
+		return unhighlitButtonStyle
+	}
+}
+
 func (m model) View() string {
 	renderedFields := ""
 	for i := 0; i < len(fields); i++ {
 		renderedFields = lipgloss.JoinHorizontal(lipgloss.Top, renderedFields, inputStyle.Render(m.inputs[i].View()))
 	}
 
-	return renderedFields
+	return lipgloss.JoinVertical(lipgloss.Center,
+		renderedFields,
+		buttonStyle(m.activeAreaIndex == 1).Render("Log dose"),
+		buttonStyle(m.activeAreaIndex == 2).Render("Backdate dose"))
 }
