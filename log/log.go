@@ -12,6 +12,7 @@ type model struct {
 	activeInputIndex int
 	activeAreaIndex  int
 	inputs           []textinput.Model
+	popupModel       *popupModel
 	returnToStart    func() (tea.Model, tea.Cmd)
 }
 
@@ -50,6 +51,7 @@ func InitializeModel(returnToStart func() (tea.Model, tea.Cmd)) (tea.Model, tea.
 	var (
 		activeInputIndex int
 		activeAreaIndex  int
+		popupModel       *popupModel
 	)
 
 	inputs := make([]textinput.Model, 3)
@@ -68,6 +70,7 @@ func InitializeModel(returnToStart func() (tea.Model, tea.Cmd)) (tea.Model, tea.
 		activeInputIndex,
 		activeAreaIndex,
 		inputs,
+		popupModel,
 		returnToStart,
 	}
 
@@ -133,70 +136,6 @@ func (m model) getValue(index int) string {
 
 func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	switch msg := msg.(type) {
-	case tea.KeyMsg:
-		switch msg.String() {
-		case "ctrl+c":
-			return m, tea.Quit
-		case "enter":
-			if m.activeAreaIndex == 1 {
-				return m, log(
-					m.getValue(QUANTITY_INDEX),
-					m.getValue(SUBSTANCE_INDEX),
-					m.getValue(ROUTE_INDEX),
-				)
-			} else if m.activeAreaIndex == 2 {
-				// TODO: DO SOMETHING COOL
-			} else {
-				return m.focusNext(false)
-			}
-		case "tab":
-			return m.focusNext(true)
-		case "shift+tab":
-			return m.focusPrevious()
-		case "left":
-			if m.activeAreaIndex == 0 {
-				m.activeInputIndex--
-
-				if m.activeInputIndex < 0 {
-					m.activeInputIndex = len(m.inputs) - 1
-				}
-
-				return m.updateAfterFocusChange()
-			}
-		case "right":
-			if m.activeAreaIndex == 0 {
-				m.activeInputIndex++
-
-				if m.activeInputIndex >= len(m.inputs) {
-					m.activeInputIndex = 0
-				}
-
-				return m.updateAfterFocusChange()
-			}
-		case "down":
-			if m.activeAreaIndex < len(buttons) {
-				m.activeAreaIndex++
-				return m.updateAfterFocusChange()
-			}
-		case "up":
-			if m.activeAreaIndex > 0 {
-				m.activeAreaIndex--
-				return m.updateAfterFocusChange()
-			}
-		default:
-			if m.activeInputIndex == -1 || m.activeAreaIndex > 0 {
-				switch msg.String() {
-				case "q", "esc":
-					return m.returnToStart()
-				}
-			} else if m.activeAreaIndex == 0 {
-				switch msg.String() {
-				case "esc":
-					m.activeInputIndex = -1
-					return m.updateAfterFocusChange()
-				}
-			}
-		}
 	case logMsg:
 		if msg.success {
 			return m.returnToStart()
@@ -204,15 +143,107 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			// TODO: Display errors
 			return m, nil
 		}
+	default:
+		if m.popupModel != nil {
+			var (
+				result *string
+				cmd    tea.Cmd
+			)
+
+			result, m.popupModel, cmd = m.popupModel.Update(msg)
+
+			if result != nil {
+				// TODO: Do something fancy
+			}
+
+			if cmd != nil {
+				return m, cmd
+			}
+		} else {
+			switch msg := msg.(type) {
+			case tea.KeyMsg:
+				switch msg.String() {
+				case "ctrl+c":
+					return m, tea.Quit
+				case "enter":
+					if m.activeAreaIndex == 1 {
+						return m, log(
+							m.getValue(QUANTITY_INDEX),
+							m.getValue(SUBSTANCE_INDEX),
+							m.getValue(ROUTE_INDEX),
+						)
+					} else if m.activeAreaIndex == 2 {
+						popupModel := initializePopupModel()
+						m.popupModel = &popupModel
+
+						return m, m.popupModel.Init()
+					} else {
+						return m.focusNext(false)
+					}
+				case "tab":
+					return m.focusNext(true)
+				case "shift+tab":
+					return m.focusPrevious()
+				case "left":
+					if m.activeAreaIndex == 0 {
+						m.activeInputIndex--
+
+						if m.activeInputIndex < 0 {
+							m.activeInputIndex = len(m.inputs) - 1
+						}
+
+						return m.updateAfterFocusChange()
+					}
+				case "right":
+					if m.activeAreaIndex == 0 {
+						m.activeInputIndex++
+
+						if m.activeInputIndex >= len(m.inputs) {
+							m.activeInputIndex = 0
+						}
+
+						return m.updateAfterFocusChange()
+					}
+				case "down":
+					if m.activeAreaIndex < len(buttons) {
+						m.activeAreaIndex++
+						return m.updateAfterFocusChange()
+					}
+				case "up":
+					if m.activeAreaIndex > 0 {
+						m.activeAreaIndex--
+						return m.updateAfterFocusChange()
+					}
+				default:
+					if m.activeInputIndex == -1 || m.activeAreaIndex > 0 {
+						switch msg.String() {
+						case "q", "esc":
+							return m.returnToStart()
+						}
+					} else if m.activeAreaIndex == 0 {
+						switch msg.String() {
+						case "esc":
+							m.activeInputIndex = -1
+							return m.updateAfterFocusChange()
+						}
+					}
+				}
+			}
+		}
+
+		if m.popupModel == nil {
+
+			cmds := make([]tea.Cmd, len(m.inputs))
+
+			for i := 0; i < len(m.inputs); i++ {
+				m.inputs[i], cmds[i] = m.inputs[i].Update(msg)
+			}
+
+			return m, tea.Batch(cmds...)
+		} else {
+			return m, nil
+		}
 	}
-
-	cmds := make([]tea.Cmd, len(m.inputs))
-
-	for i := 0; i < len(m.inputs); i++ {
-		m.inputs[i], cmds[i] = m.inputs[i].Update(msg)
-	}
-
-	return m, tea.Batch(cmds...)
 }
 
 var inputStyle = lipgloss.NewStyle().
@@ -242,8 +273,14 @@ func (m model) View() string {
 		renderedFields = lipgloss.JoinHorizontal(lipgloss.Top, renderedFields, inputStyle.Render(m.inputs[i].View()))
 	}
 
-	return lipgloss.JoinVertical(lipgloss.Center,
+	mainContent := lipgloss.JoinVertical(lipgloss.Center,
 		renderedFields,
 		buttonStyle(m.activeAreaIndex == 1).Render("Log dose"),
 		buttonStyle(m.activeAreaIndex == 2).Render("Backdate dose"))
+
+	if m.popupModel != nil {
+		return m.popupModel.View(lipgloss.Size(mainContent))
+	} else {
+		return mainContent
+	}
 }
