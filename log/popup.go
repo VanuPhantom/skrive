@@ -1,6 +1,8 @@
 package log
 
 import (
+	"strconv"
+
 	"github.com/charmbracelet/bubbles/textinput"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
@@ -24,15 +26,21 @@ func (m popupModel) Init() tea.Cmd {
 	return tea.Batch(m.input.Focus(), textinput.Blink)
 }
 
-func (m popupModel) Update(msg tea.Msg) (*string, *popupModel, tea.Cmd) {
+func (m popupModel) Update(msg tea.Msg) (*int, *popupModel, tea.Cmd) {
 	switch msg := msg.(type) {
 	case tea.KeyMsg:
 		switch msg.String() {
 		case "ctrl+c":
 			return nil, &m, tea.Quit
 		case "enter":
-			value := m.input.Value()
-			return &value, nil, nil
+			raw_value := m.input.Value()
+			value, err := strconv.Atoi(raw_value)
+
+			if err != nil {
+				m.input.Prompt = "Minutes since dose:\n(Must be an integer)\n"
+			} else {
+				return &value, nil, nil
+			}
 		case "esc":
 			return nil, nil, nil
 		}

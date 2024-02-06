@@ -134,6 +134,15 @@ func (m model) getValue(index int) string {
 	return m.inputs[index].Value()
 }
 
+func (m model) Log(offset int) (tea.Model, tea.Cmd) {
+	return m, log(
+		m.getValue(QUANTITY_INDEX),
+		m.getValue(SUBSTANCE_INDEX),
+		m.getValue(ROUTE_INDEX),
+		offset,
+	)
+}
+
 func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	switch msg := msg.(type) {
 	case logMsg:
@@ -146,14 +155,14 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	default:
 		if m.popupModel != nil {
 			var (
-				result *string
+				result *int
 				cmd    tea.Cmd
 			)
 
 			result, m.popupModel, cmd = m.popupModel.Update(msg)
 
 			if result != nil {
-				// TODO: Do something fancy
+				return m.Log(*result)
 			}
 
 			if cmd != nil {
@@ -167,11 +176,7 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 					return m, tea.Quit
 				case "enter":
 					if m.activeAreaIndex == 1 {
-						return m, log(
-							m.getValue(QUANTITY_INDEX),
-							m.getValue(SUBSTANCE_INDEX),
-							m.getValue(ROUTE_INDEX),
-						)
+						return m.Log(0)
 					} else if m.activeAreaIndex == 2 {
 						popupModel := initializePopupModel()
 						m.popupModel = &popupModel

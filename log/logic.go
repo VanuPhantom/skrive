@@ -12,10 +12,10 @@ type logMsg struct {
 	success bool
 }
 
-func log(quantity string, substance string, route string) tea.Cmd {
+func log(quantity string, substance string, route string, offset int) tea.Cmd {
 	return func() tea.Msg {
 		dose := logic.Dose{
-			Time:      time.Now(),
+			Time:      time.Now().Add(time.Duration(-offset) * time.Minute),
 			Quantity:  quantity,
 			Substance: substance,
 			Route:     route,
