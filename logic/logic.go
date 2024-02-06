@@ -3,6 +3,7 @@ package logic
 import (
 	"log"
 	"os"
+	"sort"
 	"time"
 )
 
@@ -41,6 +42,14 @@ func Load() ([]Dose, error) {
 
 		raw := string(bytes)
 
-		return decode(raw)
+		if doses, err := decode(raw); err != nil {
+			return nil, err
+		} else {
+			sort.Slice(doses, func(i, j int) bool {
+				return doses[i].Time.Unix() < doses[j].Time.Unix()
+			})
+
+			return doses, nil
+		}
 	}
 }
