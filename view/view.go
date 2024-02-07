@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"skrive/logic"
+	"skrive/wrapper"
 
 	"github.com/charmbracelet/bubbles/spinner"
 	"github.com/charmbracelet/bubbles/table"
@@ -94,11 +95,15 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 }
 
 func (m model) View() string {
+	var ui string
+
 	if m.err != nil {
-		return m.err.Error()
+		ui = m.err.Error()
 	} else if m.doses != nil {
-		return m.doseTable.View()
+		ui = m.doseTable.View()
 	} else {
-		return fmt.Sprintf("%s Loading", m.loadingIndicator.View())
+		ui = fmt.Sprintf("%s Loading", m.loadingIndicator.View())
 	}
+
+	return wrapper.Wrap(ui)
 }

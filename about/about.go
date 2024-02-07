@@ -1,6 +1,8 @@
 package about
 
 import (
+	"skrive/wrapper"
+
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
 )
@@ -52,5 +54,7 @@ func (m model) View() string {
 
 	flag := flagStyle.Render(lipgloss.JoinHorizontal(lipgloss.Top, left, centerWhite, right))
 
-	return lipgloss.JoinHorizontal(lipgloss.Center, flag, "Made in Denmark\nTess Ellenoir Duursma\nvanu.dev")
+	return wrapper.Wrap(
+		lipgloss.JoinHorizontal(lipgloss.Center, flag, "Made in Denmark\nTess Ellenoir Duursma\nvanu.dev"),
+	)
 }

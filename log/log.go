@@ -2,6 +2,7 @@ package log
 
 import (
 	"fmt"
+	"skrive/wrapper"
 
 	"github.com/charmbracelet/bubbles/textinput"
 	tea "github.com/charmbracelet/bubbletea"
@@ -278,14 +279,14 @@ func (m model) View() string {
 		renderedFields = lipgloss.JoinHorizontal(lipgloss.Top, renderedFields, inputStyle.Render(m.inputs[i].View()))
 	}
 
-	mainContent := lipgloss.JoinVertical(lipgloss.Center,
+	ui := lipgloss.JoinVertical(lipgloss.Center,
 		renderedFields,
 		buttonStyle(m.activeAreaIndex == 1).Render("Log dose"),
 		buttonStyle(m.activeAreaIndex == 2).Render("Backdate dose"))
 
 	if m.popupModel != nil {
-		return m.popupModel.View(lipgloss.Size(mainContent))
-	} else {
-		return mainContent
+		ui = m.popupModel.View(lipgloss.Size(ui))
 	}
+
+	return wrapper.Wrap(ui)
 }

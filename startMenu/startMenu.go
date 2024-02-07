@@ -4,6 +4,7 @@ import (
 	"skrive/about"
 	"skrive/log"
 	"skrive/view"
+	"skrive/wrapper"
 
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
@@ -72,8 +73,6 @@ func (m StartMenuModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	return m, nil
 }
 
-var wrapperStyle = lipgloss.NewStyle().MarginBottom(1)
-
 func (m StartMenuModel) View() string {
 	header := renderHeader()
 	list := ""
@@ -89,5 +88,5 @@ func (m StartMenuModel) View() string {
 
 	ui := lipgloss.JoinHorizontal(lipgloss.Center, header, list)
 
-	return wrapperStyle.Render(ui)
+	return wrapper.Wrap(ui)
 }
