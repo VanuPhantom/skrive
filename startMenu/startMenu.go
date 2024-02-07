@@ -72,6 +72,8 @@ func (m StartMenuModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	return m, nil
 }
 
+var wrapperStyle = lipgloss.NewStyle().MarginBottom(1)
+
 func (m StartMenuModel) View() string {
 	header := renderHeader()
 	list := ""
@@ -85,5 +87,7 @@ func (m StartMenuModel) View() string {
 
 	list = listStyle.Render(list)
 
-	return lipgloss.JoinHorizontal(lipgloss.Center, header, list)
+	ui := lipgloss.JoinHorizontal(lipgloss.Center, header, list)
+
+	return wrapperStyle.Render(ui)
 }
