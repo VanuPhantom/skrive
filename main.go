@@ -33,7 +33,7 @@ func main() {
 	program := tea.NewProgram(startMenu.InitializeModel())
 
 	if _, err := program.Run(); err != nil {
-		fmt.Println("Unskyld! Something went wrong >w< here it is: %v", err)
+		fmt.Println("Undskyld! Something went wrong >w< here it is: %v", err)
 		os.Exit(1)
 	}
 }
