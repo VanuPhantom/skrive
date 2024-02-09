@@ -46,7 +46,7 @@ func Load() ([]Dose, error) {
 			return nil, err
 		} else {
 			sort.Slice(doses, func(i, j int) bool {
-				return doses[i].Time.Unix() < doses[j].Time.Unix()
+				return doses[i].Time.Unix() > doses[j].Time.Unix()
 			})
 
 			return doses, nil
