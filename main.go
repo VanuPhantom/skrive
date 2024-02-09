@@ -3,7 +3,6 @@ package main
 import (
 	"fmt"
 	"os"
-	"path"
 
 	"skrive/logic"
 	"skrive/startMenu"
@@ -21,18 +20,15 @@ func main() {
 		defer f.Close()
 	}
 
-	if len(os.Args) >= 2 {
-		logic.Path = os.Args[1]
-	} else {
-		dirname, err := os.UserHomeDir()
-		if err == nil {
-			logic.Path = path.Join(dirname, "doses.dat")
-		}
+	err := logic.Setup()
+
+	if err == nil {
+		_, err = tea.
+			NewProgram(startMenu.InitializeModel()).
+			Run()
 	}
 
-	program := tea.NewProgram(startMenu.InitializeModel())
-
-	if _, err := program.Run(); err != nil {
+	if err != nil {
 		fmt.Println("Undskyld! Something went wrong >w< here it is: %v", err)
 		os.Exit(1)
 	}

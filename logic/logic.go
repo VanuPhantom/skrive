@@ -3,6 +3,7 @@ package logic
 import (
 	"log"
 	"os"
+	"path"
 	"sort"
 	"time"
 )
@@ -14,10 +15,35 @@ type Dose struct {
 	Route     string
 }
 
-var Path = "/opt/homebrew/var/skrive/doses.dat"
+var dosageFilePath string
+
+func Setup() error {
+	if len(os.Args) > 2 {
+		dosageFilePath = os.Args[1]
+		return nil
+	}
+
+	if value, isDefined := os.LookupEnv("SKRIVE_DOSES_PATH"); isDefined {
+		dosageFilePath = value
+		return nil
+	}
+
+	if dirname, err := os.UserHomeDir(); err != nil {
+		return homePathError{}
+	} else {
+		dosageFilePath = path.Join(dirname, "doses.dat")
+		return nil
+	}
+}
+
+type homePathError struct{}
+
+func (e homePathError) Error() string {
+	return "Could not find home directory"
+}
 
 func (d Dose) Log() error {
-	file, err := os.OpenFile(Path, os.O_APPEND|os.O_WRONLY|os.O_CREATE, 0600)
+	file, err := os.OpenFile(dosageFilePath, os.O_APPEND|os.O_WRONLY|os.O_CREATE, 0600)
 
 	if err != nil {
 		log.Println(err.Error())
@@ -36,7 +62,7 @@ func (d Dose) Log() error {
 }
 
 func Load() ([]Dose, error) {
-	if bytes, err := os.ReadFile(Path); err != nil {
+	if bytes, err := os.ReadFile(dosageFilePath); err != nil {
 		return nil, err
 	} else {
 
