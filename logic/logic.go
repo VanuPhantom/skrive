@@ -17,9 +17,9 @@ type Dose struct {
 
 var dosageFilePath string
 
-func Setup(fileArgument *string) error {
-	if fileArgument != nil {
-		dosageFilePath = *fileArgument
+func Setup(fileArgument string) error {
+	if len(fileArgument) > 0 {
+		dosageFilePath = fileArgument
 		return nil
 	}
 
