@@ -20,7 +20,13 @@ func main() {
 		defer f.Close()
 	}
 
-	err := logic.Setup()
+	parseErr := parse()
+	if parseErr != nil {
+		printHelp(parseErr)
+		os.Exit(1)
+	}
+
+	err := logic.Setup(fileArg)
 
 	if err == nil {
 		_, err = tea.
