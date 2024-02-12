@@ -2,11 +2,15 @@
 Secure and sleek dosage logging for the terminal.
 
 ## Usage
-`skrive [path to doses.dat]`
+```
+skrive [-f path to doses.dat]
+skrive log [-f path to doses.dat] [<quantity> <substance> <route>]
+```
+
 
 Skrive selects a path for the doses file in the following order:
 
-1. The path provided as the first argument, as shown above
+1. The path provided with the `-f` flag, as shown above
 2. The path given by the environment variable `SKRIVE_DOSES_PATH`, if set
 3. The path to a file called `doses.dat` in your home directory
     - `~/doses.dat` on Unix-like platforms
