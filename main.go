@@ -21,8 +21,7 @@ func main() {
 		defer f.Close()
 	}
 
-	parseErr := parse()
-	if parseErr != nil {
+	if parseErr := parse(); parseErr != nil {
 		printHelp(parseErr)
 		os.Exit(1)
 	} else if *helpFlag {
@@ -51,7 +50,7 @@ func main() {
 			Run()
 	}
 
-	handleIfError(err)
+	exitIfError(err)
 }
 
 func handleSubcommands() {
@@ -61,12 +60,12 @@ func handleSubcommands() {
 			// Handled in Bubbletea initialization code
 			return
 		}
-		handleIfError(log.Invoke(positionalArguments))
+		exitIfError(log.Invoke(positionalArguments))
 	}
 	os.Exit(0)
 }
 
-func handleIfError(err error) {
+func exitIfError(err error) {
 	if err == nil {
 		return
 	}

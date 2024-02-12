@@ -4,7 +4,7 @@ Secure and sleek dosage logging for the terminal.
 ## Usage
 ```
 skrive [-f path to doses.dat]
-skrive log [-f path to doses.dat] <quantity> <substance> <route>
+skrive log [-f path to doses.dat] [<quantity> <substance> <route>]
 ```
 
 
