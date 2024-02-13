@@ -1,0 +1,67 @@
+.TH SKRIVE 1 local
+.SH NAME
+skrive \- Log doses via the terminal
+.SH SYNOPSIS
+.ll +8
+.B skrive
+.RB [ " \-f doses-file " ]
+.ll +8
+.br
+.B skrive
+.RB log
+.RB [ " \-f doses-file " ]
+[
+.I "quantity "
+.I "substance "
+.I "route "
+[ 
+.I "offset-in-minutes"
+]
+]
+
+.SH DESCRIPTION
+.PP
+.I Skrive
+is a dosage logger for the terminal. Skrive logs doses by quantity,
+substance, and route at a certain point of time. The doses are logged
+to a file and can be viewed later. Skrive has both TUI and partial CLI
+support.
+
+.SH OPTIONS
+.TP
+.B \-f \-\-file
+Set the file path where doses will be read and written to. This flag takes absolute priority.
+.TP
+.B \-h \-\-help
+Display brief usage information.
+
+.SH "ENVIRONMENT"
+.TP
+.B SKRIVE_DOSES_PATH
+If set, this file path will be used instead of the default file path
+for reading and writing doses. If the file does not exist it will be
+created.
+
+.SH "FILES"
+.TP
+.B ~/doses.dat
+.PP
+The default location that
+.I skrive
+will use for logging doses if no other path has been specified. If the
+file does not exist it will be created.
+
+.SH "EXAMPLES"
+.TP
+.B skrive
+Open the TUI to log and view doses.
+.TP
+.B skrive \-f subdir/doses.dat
+Open the TUI and log to
+.I subdir/doses.dat
+.TP
+.B skrive log 2mg Estradiol Sublingual 120
+Immediately log 2mg estradiol sublingually, taken 2 hours ago.
+.TP
+.B skrive log
+Shortcut to enter a single dose via the TUI before exiting.
