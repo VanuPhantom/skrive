@@ -10,7 +10,9 @@ import (
 
 func Invoke(arguments []string) error {
 	if len(arguments) < 3 && len(arguments) > 4 {
-		fmt.Println("Must either provide either 0, 3 or 4 separate arguments (quantity, substance, route and - optionally - minutes since dose)")
+		fmt.Println("Usage: " +
+			"skrive log [-f path to doses.dat] " +
+			"[<quantity> <substance> <route> [minutes since dose]]")
 		os.Exit(1)
 	}
 
