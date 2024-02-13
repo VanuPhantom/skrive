@@ -30,7 +30,7 @@ func parse() error {
 		remainingArgs = os.Args
 	}
 
-	positionalParameters := [3]*string{}
+	positionalParameters := [4]*string{}
 
 	if subcommand != nil && *subcommand == "log" {
 		options := argparse.Options{Help: argparse.DisableDescription}
