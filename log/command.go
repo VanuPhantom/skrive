@@ -4,19 +4,35 @@ import (
 	"fmt"
 	"os"
 	"skrive/logic"
+	"strconv"
 	"time"
 )
 
 func Invoke(arguments []string) error {
-	if len(arguments) != 3 {
-		fmt.Println("Must either provide either 0 or 3 separate arguments (quantity, substance, & route)")
+	if len(arguments) < 3 && len(arguments) > 4 {
+		fmt.Println("Usage: " +
+			"skrive log [-f path to doses.dat] " +
+			"[<quantity> <substance> <route> [minutes since dose]]")
 		os.Exit(1)
 	}
 
-	log(arguments[0], arguments[1], arguments[2], 0)
+	time := time.Now()
+	offsetDescription := ""
+
+	if len(arguments) > 3 {
+		value, err := strconv.Atoi(arguments[3])
+
+		if err != nil {
+			fmt.Println("Minutes since dose must be an integer!")
+			os.Exit(1)
+		}
+
+		time = timeFromOffset(value)
+		offsetDescription = fmt.Sprintf(" %d minutes ago", value)
+	}
 
 	dose := logic.Dose{
-		Time:      time.Now(),
+		Time:      time,
 		Quantity:  arguments[0],
 		Substance: arguments[1],
 		Route:     arguments[2],
@@ -26,6 +42,12 @@ func Invoke(arguments []string) error {
 		return err
 	}
 
-	fmt.Printf("Logged %s of %s, taken via route %s\n", arguments[0], arguments[1], arguments[2])
+	fmt.Printf(
+		"Logged %s of %s, taken via route %s%s\n",
+		arguments[0],
+		arguments[1],
+		arguments[2],
+		offsetDescription,
+	)
 	return nil
 }
