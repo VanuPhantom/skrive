@@ -23,7 +23,7 @@ skrive \- Log doses via the terminal
 .PP
 .I Skrive
 is a dosage logger for the terminal. Skrive logs doses by quantity,
-substance, and route at a certain point of time. The doses are logged
+substance, and route at a certain point in time. The doses are logged
 to a file and can be viewed later. Skrive has both TUI and partial CLI
 support.
 
@@ -39,7 +39,7 @@ Display brief usage information.
 .TP
 .B SKRIVE_DOSES_PATH
 If set, this file path will be used instead of the default file path
-for reading and writing doses. If the file does not exist it will be
+for reading and writing doses. If the file does not exist, it will be
 created.
 
 .SH "FILES"
@@ -49,7 +49,7 @@ created.
 The default location that
 .I skrive
 will use for logging doses if no other path has been specified. If the
-file does not exist it will be created.
+file does not exist, it will be created.
 
 .SH "EXAMPLES"
 .TP
