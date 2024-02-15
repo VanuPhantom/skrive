@@ -79,3 +79,20 @@ func Load() ([]Dose, error) {
 		}
 	}
 }
+
+func Overwrite(doses []Dose) error {
+	file, err := os.OpenFile(dosageFilePath, os.O_RDWR|os.O_TRUNC, 0600)
+	defer file.Close()
+
+	if err == nil {
+		for i := range doses {
+			if _, err = file.WriteString(doses[i].encode() + "\n"); err != nil {
+				break
+			}
+		}
+	}
+
+	file.Sync()
+
+	return err
+}
