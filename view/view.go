@@ -2,6 +2,7 @@ package view
 
 import (
 	"fmt"
+	"strconv"
 
 	"skrive/logic"
 	"skrive/wrapper"
@@ -44,18 +45,12 @@ func (m model) Init() tea.Cmd {
 	return tea.Batch(load, m.loadingIndicator.Tick)
 }
 
-func createTable(doses []logic.Dose) table.Model {
-	columns := []table.Column{
-		{Title: "Time", Width: 20},
-		{Title: "Amount", Width: 15},
-		{Title: "Substance", Width: 25},
-		{Title: "Route", Width: 25},
-	}
-
+func getTableRows(doses []logic.Dose) []table.Row {
 	rows := make([]table.Row, len(doses))
 
 	for i, dose := range doses {
 		rows[i] = table.Row{
+			strconv.Itoa(i + 1),
 			dose.Time.Local().Format("2006-01-02 15:04:05"),
 			dose.Quantity,
 			dose.Substance,
@@ -63,9 +58,21 @@ func createTable(doses []logic.Dose) table.Model {
 		}
 	}
 
+	return rows
+}
+
+func createTable(doses []logic.Dose) table.Model {
+	columns := []table.Column{
+		{Title: "#", Width: 4},
+		{Title: "Time", Width: 20},
+		{Title: "Amount", Width: 15},
+		{Title: "Substance", Width: 25},
+		{Title: "Route", Width: 25},
+	}
+
 	return table.New(
 		table.WithColumns(columns),
-		table.WithRows(rows),
+		table.WithRows(getTableRows(doses)),
 		table.WithFocused(true),
 		table.WithHeight(10),
 	)
@@ -79,12 +86,26 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			return m, tea.Quit
 		case "q", "esc":
 			return m.returnToStart()
+		case "d":
+			if len(m.doses) > 0 {
+				index, _ := strconv.Atoi(
+					m.doseTable.SelectedRow()[0],
+				)
+
+				return m, remove(m.doses, index-1)
+			}
 		}
 	case successfulLoadMsg:
 		m.doses = msg.doses
 		m.doseTable = createTable(msg.doses)
 	case failedLoadMsg:
 		m.err = msg.err
+	case removeMsg:
+		m.doses = msg.doses
+		m.doseTable.SetRows(getTableRows(m.doses))
+		if m.doseTable.SelectedRow() == nil && len(m.doses) > 0 {
+			m.doseTable.MoveUp(1)
+		}
 	}
 
 	cmds := make([]tea.Cmd, 2)
