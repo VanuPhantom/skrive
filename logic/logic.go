@@ -81,7 +81,7 @@ func Load() ([]Dose, error) {
 }
 
 func Overwrite(doses []Dose) error {
-	file, err := os.OpenFile(dosageFilePath, os.O_RDWR|os.O_TRUNC, 0600)
+	file, err := os.OpenFile(dosageFilePath, os.O_WRONLY|os.O_TRUNC, 0600)
 	defer file.Close()
 
 	if err == nil {
