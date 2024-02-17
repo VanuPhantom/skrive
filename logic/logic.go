@@ -81,8 +81,10 @@ func Load() ([]Dose, error) {
 }
 
 func Overwrite(doses []Dose) error {
-	file, err := os.OpenFile(dosageFilePath, os.O_WRONLY|os.O_TRUNC, 0600)
-	defer file.Close()
+	file, err := os.CreateTemp("", "skrive-tmp")
+	if err == nil {
+		err = file.Chmod(0600)
+	}
 
 	if err == nil {
 		for i := range doses {
@@ -92,7 +94,18 @@ func Overwrite(doses []Dose) error {
 		}
 	}
 
-	file.Sync()
+	if err == nil {
+		err = file.Sync()
+	}
+	
+	closeErr := file.Close()
+	if err == nil && closeErr != nil {
+		return closeErr
+	}
+
+	if err == nil {
+		err = os.Rename(file.Name(), dosageFilePath)
+	}
 
 	return err
 }
