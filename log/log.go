@@ -262,8 +262,8 @@ var unhighlitButtonStyle = lipgloss.NewStyle().
 	Width(21)
 
 var highlitButtonStyle = unhighlitButtonStyle.Copy().
-	Foreground(lipgloss.Color("#000000")).
-	Background(lipgloss.Color("#FFFFFF"))
+	Foreground(lipgloss.AdaptiveColor{Dark: "#000000", Light: "#FFFFFF"}).
+	Background(lipgloss.AdaptiveColor{Dark: "#FFFFFF", Light: "#000000"})
 
 func buttonStyle(highlit bool) lipgloss.Style {
 	if highlit {

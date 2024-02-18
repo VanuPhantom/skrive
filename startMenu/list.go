@@ -4,8 +4,8 @@ import "github.com/charmbracelet/lipgloss"
 
 var itemStyle = lipgloss.NewStyle()
 var highlightedItemStyle = itemStyle.
-	Background(lipgloss.Color("#D3D3D3")).
-	Foreground(lipgloss.Color("#000000"))
+	Foreground(lipgloss.AdaptiveColor{Dark: "#000000", Light: "#FFFFFF"}).
+	Background(lipgloss.AdaptiveColor{Dark: "#FFFFFF", Light: "#000000"})
 
 var listStyle = lipgloss.NewStyle().Margin(1)
 
