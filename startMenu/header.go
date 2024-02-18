@@ -4,7 +4,7 @@ import "github.com/charmbracelet/lipgloss"
 
 var blueStyle = lipgloss.NewStyle().Foreground(lipgloss.Color("#5BCEFA"))
 var pinkStyle = lipgloss.NewStyle().Foreground(lipgloss.Color("#F5A9B8"))
-var whiteStyle = lipgloss.NewStyle().Foreground(lipgloss.Color("#FFFFFF"))
+var whiteStyle = lipgloss.NewStyle().Foreground(lipgloss.ANSIColor(7))
 
 var headerStyle = lipgloss.NewStyle().
 	Bold(true).
