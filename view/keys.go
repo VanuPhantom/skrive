@@ -42,7 +42,7 @@ var keys = keyMap{
 	),
 	Quit: key.NewBinding(
 		key.WithKeys("q", "esc"),
-		key.WithHelp("q/esc", "quit"),
+		key.WithHelp("q/esc", "close this screen"),
 	),
 	Exit: key.NewBinding(
 		key.WithKeys("ctrl+c"),
