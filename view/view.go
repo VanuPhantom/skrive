@@ -7,6 +7,8 @@ import (
 	"skrive/logic"
 	"skrive/wrapper"
 
+	"github.com/charmbracelet/bubbles/help"
+	"github.com/charmbracelet/bubbles/key"
 	"github.com/charmbracelet/bubbles/spinner"
 	"github.com/charmbracelet/bubbles/table"
 	tea "github.com/charmbracelet/bubbletea"
@@ -19,6 +21,8 @@ type model struct {
 
 	loadingIndicator spinner.Model
 	doseTable        table.Model
+
+	help help.Model
 }
 
 func InitializeModel(returnToStart func() (tea.Model, tea.Cmd)) (tea.Model, tea.Cmd) {
@@ -30,12 +34,15 @@ func InitializeModel(returnToStart func() (tea.Model, tea.Cmd)) (tea.Model, tea.
 	var doses []logic.Dose = nil
 	var err error = nil
 
+	help := help.New()
+
 	model := model{
 		returnToStart,
 		doses,
 		err,
 		loadingIndicator,
 		doseTable,
+		help,
 	}
 
 	return model, model.Init()
@@ -81,12 +88,12 @@ func createTable(doses []logic.Dose) table.Model {
 func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	switch msg := msg.(type) {
 	case tea.KeyMsg:
-		switch msg.String() {
-		case "ctrl+c":
+		switch {
+		case key.Matches(msg, keys.Exit):
 			return m, tea.Quit
-		case "q", "esc":
+		case key.Matches(msg, keys.Quit):
 			return m.returnToStart()
-		case "d":
+		case key.Matches(msg, keys.Delete):
 			if len(m.doses) > 0 {
 				index, _ := strconv.Atoi(
 					m.doseTable.SelectedRow()[0],
@@ -94,7 +101,10 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 				return m, remove(m.doses, index-1)
 			}
+		case key.Matches(msg, keys.Help):
+			m.help.ShowAll = !m.help.ShowAll
 		}
+
 	case successfulLoadMsg:
 		m.doses = msg.doses
 		m.doseTable = createTable(msg.doses)
@@ -121,7 +131,10 @@ func (m model) View() string {
 	if m.err != nil {
 		ui = m.err.Error()
 	} else if m.doses != nil {
-		ui = m.doseTable.View()
+		ui = fmt.Sprintf("%s\n%s",
+			m.doseTable.View(),
+			m.help.View(keys),
+		)
 	} else {
 		ui = fmt.Sprintf("%s Loading", m.loadingIndicator.View())
 	}
