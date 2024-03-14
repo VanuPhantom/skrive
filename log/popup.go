@@ -2,6 +2,7 @@ package log
 
 import (
 	"strconv"
+	"strings"
 
 	"github.com/charmbracelet/bubbles/textinput"
 	tea "github.com/charmbracelet/bubbletea"
@@ -19,7 +20,19 @@ func increment(raw_before_delimiter *string, field *int) error {
 	return err
 }
 
+type emptyTimeError struct{}
+
+func (e *emptyTimeError) Error() string {
+	return "The time cannot be empty."
+}
+
 func parseTime(raw string) (int, error) {
+	raw = strings.Trim(raw, " ")
+
+	if len(raw) == 0 {
+		return 0, &emptyTimeError{}
+	}
+
 	days := 0
 	hours := 0
 	minutes := 0
