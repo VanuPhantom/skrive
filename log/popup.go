@@ -89,7 +89,7 @@ func (m popupModel) Update(msg tea.Msg) (*int, *popupModel, tea.Cmd) {
 			value, err := parseTime(raw_value)
 
 			if err != nil {
-				m.input.Prompt = "Minutes since dose:\n(Must be an integer)\n"
+				m.input.Prompt = "Minutes since dose:\n(1d2h3m or 123 (for 123 minutes))\n"
 			} else {
 				return &value, nil, nil
 			}
