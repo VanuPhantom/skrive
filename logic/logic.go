@@ -79,3 +79,33 @@ func Load() ([]Dose, error) {
 		}
 	}
 }
+
+func Overwrite(doses []Dose) error {
+	file, err := os.CreateTemp("", "skrive-tmp")
+	if err == nil {
+		err = file.Chmod(0600)
+	}
+
+	if err == nil {
+		for i := range doses {
+			if _, err = file.WriteString(doses[i].encode() + "\n"); err != nil {
+				break
+			}
+		}
+	}
+
+	if err == nil {
+		err = file.Sync()
+	}
+	
+	closeErr := file.Close()
+	if err == nil && closeErr != nil {
+		return closeErr
+	}
+
+	if err == nil {
+		err = os.Rename(file.Name(), dosageFilePath)
+	}
+
+	return err
+}
