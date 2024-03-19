@@ -15,7 +15,7 @@ skrive \- Log doses via the terminal
 .I "substance "
 .I "route "
 [ 
-.I "offset-in-minutes"
+.I "TIME-SPEC"
 ]
 ]
 
@@ -34,6 +34,15 @@ Set the file path where doses will be read and written to. This flag takes absol
 .TP
 .B \-h \-\-help
 Display brief usage information.
+
+.SH LOG TIME SPECIFICATION
+.PP
+Both the log TUI and the log subcommand accepts a time offset for backdating doses.
+Skrive accepts a format like 
+.I 1d2h3m
+or
+.I 123
+\[char46] If a plain integer is provided, it will be interpreted as minutes.
 
 .SH "ENVIRONMENT"
 .TP
@@ -60,8 +69,11 @@ Open the TUI to log and view doses.
 Open the TUI and log to
 .I subdir/doses.dat
 .TP
-.B skrive log 2mg Estradiol Sublingual 120
-Immediately log 2mg estradiol sublingually, taken 2 hours ago.
+.B skrive log 2mg Estradiol Sublingual 30
+Immediately log 2mg estradiol sublingually, taken 30 minutes ago.
+.TP
+.B skrive log 2mg Estradiol Sublingual 1h30m
+Immediately log 2mg estradiol sublingually, taken 90 minutes ago.
 .TP
 .B skrive log
 Shortcut to enter a single dose via the TUI before exiting.

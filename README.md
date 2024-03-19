@@ -4,9 +4,10 @@ Secure and sleek dosage logging for the terminal.
 ## Usage
 ```
 skrive [-f path to doses.dat]
-skrive log [-f path to doses.dat] [<quantity> <substance> <route> [minutes since dose]]
+skrive log [-f path to doses.dat] [<quantity> <substance> <route> [time-spec]]
 ```
 
+The log command accepts time formats like `1h30m` or `90` for backdating doses e.g. 90 minutes.
 
 Skrive selects a path for the doses file in the following order:
 
