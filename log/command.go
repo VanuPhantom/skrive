@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"os"
 	"skrive/logic"
-	"strconv"
 	"time"
 )
 
@@ -12,7 +11,7 @@ func Invoke(arguments []string) error {
 	if len(arguments) < 3 && len(arguments) > 4 {
 		fmt.Println("Usage: " +
 			"skrive log [-f path to doses.dat] " +
-			"[<quantity> <substance> <route> [minutes since dose]]")
+			"[<quantity> <substance> <route> [time-spec]]")
 		os.Exit(1)
 	}
 
@@ -20,10 +19,10 @@ func Invoke(arguments []string) error {
 	offsetDescription := ""
 
 	if len(arguments) > 3 {
-		value, err := strconv.Atoi(arguments[3])
+		value, err := parseTime(arguments[3])
 
 		if err != nil {
-			fmt.Println("Minutes since dose must be an integer!")
+			fmt.Println("Time argument must be like 1d2h3m or 123 (for 123 minutes)")
 			os.Exit(1)
 		}
 
