@@ -37,12 +37,18 @@ Display brief usage information.
 
 .SH LOG TIME SPECIFICATION
 .PP
-Both the log TUI and the log subcommand accepts a time offset for backdating doses.
-Skrive accepts a format like 
-.I 1d2h3m
-or
-.I 123
-\[char46] If a plain integer is provided, it will be interpreted as minutes.
+Both the log TUI and the log subcommand accept a time offset for backdating doses.
+.PP
+Skrive accepts both a dhm format and plain integers. For example, for 90 minutes, one can use the following options:
+.br
+\[bu]
+.I 1h30m
+.br
+\[bu]
+.I 1h30
+.br
+\[bu]
+.I 90
 
 .SH "ENVIRONMENT"
 .TP
