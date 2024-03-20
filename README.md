@@ -7,7 +7,11 @@ skrive [-f path to doses.dat]
 skrive log [-f path to doses.dat] [<quantity> <substance> <route> [time-spec]]
 ```
 
-The log command accepts time formats like `1h30m` or `90` for backdating doses e.g. 90 minutes.
+The log command's time argument can be formatted using either `dhm` formatting or as a number of minutes.  
+For example, 90 minutes can be formatted as follows;
+- `1h30m`
+- `1h30`
+- `90`
 
 Skrive selects a path for the doses file in the following order:
 
