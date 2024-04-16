@@ -44,9 +44,9 @@ func decode(raw string) ([]data.Dose, error) {
 	doses := make([]data.Dose, 0)
 
 	for j := 0; j < len(runes); {
-		sections := [4]string{"", "", "", ""}
+		sections := [5]string{"", "", "", "", ""}
 	sectionLoop:
-		for i := 0; i < 4; i++ {
+		for i := 0; i < 5; i++ {
 			for ; j < len(runes); j++ {
 				character := runes[j]
 
@@ -76,6 +76,7 @@ func decode(raw string) ([]data.Dose, error) {
 
 		doses = append(doses,
 			data.Dose{
+				Id:        data.Id(sections[0]),
 				Time:      time.Unix(unix, 0),
 				Quantity:  sections[1],
 				Substance: sections[2],
