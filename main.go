@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"os"
 
+	"skrive/data"
+	"skrive/data/fs"
 	"skrive/log"
 	"skrive/logic"
 	"skrive/startMenu"
@@ -53,6 +55,13 @@ func main() {
 	exitIfError(err)
 }
 
+func initialiseStorageInterface() data.Storage {
+	// There is currently only one type of storage
+	p, err := fs.GetPath(*fileArg)
+	exitIfError(err)
+	return fs.FsStorage{Path: *p}
+}
+
 func handleSubcommands() {
 	switch *subcommand {
 	case "log":
@@ -60,7 +69,8 @@ func handleSubcommands() {
 			// Handled in Bubbletea initialization code
 			return
 		}
-		exitIfError(log.Invoke(positionalArguments))
+		var storage = initialiseStorageInterface()
+		exitIfError(log.Invoke(storage, positionalArguments))
 	}
 	os.Exit(0)
 }

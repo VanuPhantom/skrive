@@ -3,11 +3,11 @@ package log
 import (
 	"fmt"
 	"os"
-	"skrive/logic"
+	"skrive/data"
 	"time"
 )
 
-func Invoke(arguments []string) error {
+func Invoke(storage data.Storage, arguments []string) error {
 	if len(arguments) < 3 && len(arguments) > 4 {
 		fmt.Println("Usage: " +
 			"skrive log [-f path to doses.dat] " +
@@ -30,14 +30,14 @@ func Invoke(arguments []string) error {
 		offsetDescription = fmt.Sprintf(" %d minutes ago", value)
 	}
 
-	dose := logic.Dose{
+	dose := data.Dose{
 		Time:      time,
 		Quantity:  arguments[0],
 		Substance: arguments[1],
 		Route:     arguments[2],
 	}
 
-	if err := dose.Log(); err != nil {
+	if err := storage.Append(dose); err != nil {
 		return err
 	}
 

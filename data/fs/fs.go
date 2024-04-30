@@ -3,16 +3,40 @@ package fs
 import (
 	"log"
 	"os"
+	"path"
 	"skrive/data"
 	"sort"
 )
 
 type FsStorage struct {
-	path string
+	Path string
+}
+
+func GetPath(fileArgument string) (*string, error) {
+	if len(fileArgument) > 0 {
+		return &fileArgument, nil
+	}
+
+	if value, isDefined := os.LookupEnv("SKRIVE_DOSES_PATH"); isDefined {
+		return &value, nil
+	}
+
+	if dirname, err := os.UserHomeDir(); err != nil {
+		return nil, homePathError{}
+	} else {
+		var p = path.Join(dirname, "doses.dat")
+		return &p, nil
+	}
+}
+
+type homePathError struct{}
+
+func (e homePathError) Error() string {
+	return "Could not find home directory"
 }
 
 func (storage FsStorage) Append(dose data.Dose) error {
-	file, err := os.OpenFile(storage.path, os.O_APPEND|os.O_WRONLY|os.O_CREATE, 0600)
+	file, err := os.OpenFile(storage.Path, os.O_APPEND|os.O_WRONLY|os.O_CREATE, 0600)
 
 	if err != nil {
 		log.Println(err.Error())
@@ -31,7 +55,7 @@ func (storage FsStorage) Append(dose data.Dose) error {
 }
 
 func (storage FsStorage) FetchAll() ([]data.Dose, error) {
-	if bytes, err := os.ReadFile(storage.path); err != nil {
+	if bytes, err := os.ReadFile(storage.Path); err != nil {
 		return nil, err
 	} else {
 		raw := string(bytes)
@@ -72,7 +96,7 @@ func (storage FsStorage) overwrite(doses []data.Dose) error {
 	}
 
 	if err == nil {
-		err = os.Rename(file.Name(), storage.path)
+		err = os.Rename(file.Name(), storage.Path)
 	}
 
 	return err
