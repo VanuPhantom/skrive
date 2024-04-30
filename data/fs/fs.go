@@ -6,6 +6,7 @@ import (
 	"path"
 	"skrive/data"
 	"sort"
+	"strings"
 
 	gonanoid "github.com/matoous/go-nanoid/v2"
 )
@@ -38,6 +39,10 @@ func (e homePathError) Error() string {
 }
 
 func (storage FsStorage) Append(dose data.Dose) error {
+	if err := storage.probeAndMigrate(); err != nil {
+		return err
+	}
+
 	file, err := os.OpenFile(storage.Path, os.O_APPEND|os.O_WRONLY|os.O_CREATE, 0600)
 
 	if err == nil && len(dose.Id) == 0 {
@@ -63,12 +68,16 @@ func (storage FsStorage) Append(dose data.Dose) error {
 }
 
 func (storage FsStorage) FetchAll() ([]data.Dose, error) {
+	if err := storage.probeAndMigrate(); err != nil {
+		return nil, err
+	}
+
 	if bytes, err := os.ReadFile(storage.Path); err != nil {
 		return nil, err
 	} else {
 		raw := string(bytes)
 
-		if doses, err := decode(raw); err != nil {
+		if doses, err := parseVersion1(raw); err != nil {
 			return nil, err
 		} else {
 			sort.Slice(doses, func(i, j int) bool {
@@ -84,6 +93,10 @@ func (storage FsStorage) overwrite(doses []data.Dose) error {
 	file, err := os.CreateTemp("", "skrive-tmp")
 	if err == nil {
 		err = file.Chmod(0600)
+	}
+
+	if err == nil {
+		file.WriteString("Version:1\n")
 	}
 
 	if err == nil {
@@ -126,4 +139,38 @@ func (storage FsStorage) DeleteDose(id data.Id) error {
 	}
 
 	return storage.overwrite(result)
+}
+
+func (storage FsStorage) probeAndMigrate() error {
+	file, err := os.Open(storage.Path)
+
+	var header string
+	if err == nil {
+		var buf = make([]byte, 10)
+		_, err = file.Read(buf)
+		header = string(buf)
+	}
+
+	if err != nil {
+		return nil
+	} else if !strings.HasPrefix(header, "Version:") {
+		println("Migrating data from version 0 to version 1")
+		var bytes []byte
+		bytes, err = os.ReadFile(storage.Path)
+		var doses []data.Dose
+
+		if err == nil {
+			doses, err = parseHeaderless(string(bytes))
+		}
+
+		if err == nil {
+			err = storage.overwrite(doses)
+		}
+
+		return err
+	} else if strings.HasPrefix("Version:1\n", header) {
+		return nil
+	} else {
+		return DecodeError{Kind: UNKNOWN_HEADER, context: &strings.SplitN(header, "\n", 1)[0]}
+	}
 }

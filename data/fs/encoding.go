@@ -130,13 +130,3 @@ func parseVersion1(raw string) ([]data.Dose, error) {
 		}, nil
 	})
 }
-
-func decode(raw string) ([]data.Dose, error) {
-	if !strings.HasPrefix(raw, "Version:") {
-		return parseHeaderless(raw)
-	} else if strings.HasPrefix("Version:1\n", raw) {
-		return parseVersion1(strings.TrimPrefix(raw, "Version:1\n"))
-	} else {
-		return nil, DecodeError{Kind: UNKNOWN_HEADER, context: &strings.SplitN(raw, "\n", 1)[0]}
-	}
-}
