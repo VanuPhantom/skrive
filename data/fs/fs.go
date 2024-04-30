@@ -6,6 +6,8 @@ import (
 	"path"
 	"skrive/data"
 	"sort"
+
+	gonanoid "github.com/matoous/go-nanoid/v2"
 )
 
 type FsStorage struct {
@@ -37,6 +39,12 @@ func (e homePathError) Error() string {
 
 func (storage FsStorage) Append(dose data.Dose) error {
 	file, err := os.OpenFile(storage.Path, os.O_APPEND|os.O_WRONLY|os.O_CREATE, 0600)
+
+	if err == nil && len(dose.Id) == 0 {
+		var id string
+		id, err = gonanoid.New()
+		dose.Id = data.Id(id)
+	}
 
 	if err != nil {
 		log.Println(err.Error())
