@@ -76,8 +76,8 @@ func (storage FsStorage) FetchAll() ([]data.Dose, error) {
 		return nil, err
 	} else {
 		raw := string(bytes)
-
-		if doses, err := parseVersion1(raw); err != nil {
+		withoutHeader := strings.SplitN(raw, "Version:1\n", 2)[1]
+		if doses, err := parseVersion1(withoutHeader); err != nil {
 			return nil, err
 		} else {
 			sort.Slice(doses, func(i, j int) bool {
@@ -130,13 +130,15 @@ func (storage FsStorage) DeleteDose(id data.Id) error {
 		return err
 	}
 
-	result := make([]data.Dose, len(original)-1)
+	result := make([]data.Dose, 0)
 
 	for _, dose := range original {
 		if dose.Id != id {
 			result = append(result, dose)
 		}
 	}
+
+	log.Println(result)
 
 	return storage.overwrite(result)
 }
