@@ -17,3 +17,5 @@ type Storage interface {
 	Append(Dose) error
 	DeleteDose(Id) error
 }
+
+var ApplicationStorage Storage

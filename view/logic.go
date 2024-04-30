@@ -1,13 +1,13 @@
 package view
 
 import (
-	"skrive/logic"
+	"skrive/data"
 
 	tea "github.com/charmbracelet/bubbletea"
 )
 
 type successfulLoadMsg struct {
-	doses []logic.Dose
+	doses []data.Dose
 }
 
 type failedLoadMsg struct {
@@ -15,7 +15,7 @@ type failedLoadMsg struct {
 }
 
 func load() tea.Msg {
-	if doses, err := logic.Load(); err != nil {
+	if doses, err := data.ApplicationStorage.FetchAll(); err != nil {
 		return failedLoadMsg{
 			err,
 		}
@@ -27,16 +27,20 @@ func load() tea.Msg {
 }
 
 type removeMsg struct {
-	doses []logic.Dose
+	doses []data.Dose
 }
 
-func remove(doses []logic.Dose, index int) tea.Cmd {
+func remove(id data.Id, doses []data.Dose) tea.Cmd {
 	return func() tea.Msg {
-		newDoses := make([]logic.Dose, 0)
-		newDoses = append(newDoses, doses[:index]...)
-		newDoses = append(newDoses, doses[index+1:]...)
+		newDoses := make([]data.Dose, 0)
 
-		if logic.Overwrite(newDoses) == nil {
+		for _, dose := range doses {
+			if dose.Id != id {
+				newDoses = append(newDoses, dose)
+			}
+		}
+
+		if data.ApplicationStorage.DeleteDose(id) == nil {
 			return removeMsg{
 				doses: newDoses,
 			}

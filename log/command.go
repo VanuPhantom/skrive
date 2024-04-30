@@ -7,7 +7,7 @@ import (
 	"time"
 )
 
-func Invoke(storage data.Storage, arguments []string) error {
+func Invoke(arguments []string) error {
 	if len(arguments) < 3 && len(arguments) > 4 {
 		fmt.Println("Usage: " +
 			"skrive log [-f path to doses.dat] " +
@@ -37,7 +37,7 @@ func Invoke(storage data.Storage, arguments []string) error {
 		Route:     arguments[2],
 	}
 
-	if err := storage.Append(dose); err != nil {
+	if err := data.ApplicationStorage.Append(dose); err != nil {
 		return err
 	}
 

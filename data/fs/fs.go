@@ -138,8 +138,6 @@ func (storage FsStorage) DeleteDose(id data.Id) error {
 		}
 	}
 
-	log.Println(result)
-
 	return storage.overwrite(result)
 }
 

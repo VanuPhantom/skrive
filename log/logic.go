@@ -3,7 +3,7 @@ package log
 import (
 	"time"
 
-	"skrive/logic"
+	"skrive/data"
 
 	tea "github.com/charmbracelet/bubbletea"
 )
@@ -18,14 +18,14 @@ func timeFromOffset(offset int) time.Time {
 
 func log(quantity string, substance string, route string, offset int) tea.Cmd {
 	return func() tea.Msg {
-		dose := logic.Dose{
+		dose := data.Dose{
 			Time:      timeFromOffset(offset),
 			Quantity:  quantity,
 			Substance: substance,
 			Route:     route,
 		}
 
-		err := dose.Log()
+		err := data.ApplicationStorage.Append(dose)
 
 		return logMsg{
 			success: err == nil,

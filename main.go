@@ -7,7 +7,6 @@ import (
 	"skrive/data"
 	"skrive/data/fs"
 	"skrive/log"
-	"skrive/logic"
 	"skrive/startMenu"
 
 	tea "github.com/charmbracelet/bubbletea"
@@ -31,26 +30,24 @@ func main() {
 		os.Exit(0)
 	}
 
-	err := logic.Setup(*fileArg)
-
-	if err == nil && subcommand != nil {
+	if subcommand != nil {
 		handleSubcommands()
 	}
 
-	if err == nil {
-		var model tea.Model
-		if subcommand != nil && *subcommand == "log" {
-			model, _ = log.InitializeModel(func() (tea.Model, tea.Cmd) {
-				return model, tea.Quit
-			})
-		} else {
-			model = startMenu.InitializeModel()
-		}
+	data.ApplicationStorage = initialiseStorageInterface()
 
-		_, err = tea.
-			NewProgram(model).
-			Run()
+	var model tea.Model
+	if subcommand != nil && *subcommand == "log" {
+		model, _ = log.InitializeModel(func() (tea.Model, tea.Cmd) {
+			return model, tea.Quit
+		})
+	} else {
+		model = startMenu.InitializeModel()
 	}
+
+	_, err := tea.
+		NewProgram(model).
+		Run()
 
 	exitIfError(err)
 }
@@ -69,8 +66,7 @@ func handleSubcommands() {
 			// Handled in Bubbletea initialization code
 			return
 		}
-		var storage = initialiseStorageInterface()
-		exitIfError(log.Invoke(storage, positionalArguments))
+		exitIfError(log.Invoke(positionalArguments))
 	}
 	os.Exit(0)
 }
