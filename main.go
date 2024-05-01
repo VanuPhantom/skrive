@@ -30,11 +30,11 @@ func main() {
 		os.Exit(0)
 	}
 
+	data.ApplicationStorage = initialiseStorageInterface()
+
 	if subcommand != nil {
 		handleSubcommands()
 	}
-
-	data.ApplicationStorage = initialiseStorageInterface()
 
 	var model tea.Model
 	if subcommand != nil && *subcommand == "log" {
