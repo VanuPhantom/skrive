@@ -37,9 +37,9 @@ func (e DecodeError) Error() string {
 	case ENDS_WITH_ESCAPE:
 		return "The raw string ends with an escape character."
 	case BAD_TIME:
-		return "Failed to parse a time stamp."
+		return "Failed to parse a timestamp."
 	case UNKNOWN_HEADER:
-		return fmt.Sprintf("Unknown header encountered when reading file: %s", *e.context)
+		return fmt.Sprintf("Unknown header encountered while reading file: %s", *e.context)
 	default:
 		panic(fmt.Sprintf("DecodeError.Error has no case for error code %d.", e.Kind))
 	}

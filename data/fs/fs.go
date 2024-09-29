@@ -35,7 +35,7 @@ func GetPath(fileArgument string) (*string, error) {
 type homePathError struct{}
 
 func (e homePathError) Error() string {
-	return "Could not find home directory"
+	return "Could not find a home directory."
 }
 
 func (storage FsStorage) Append(dose data.Dose) error {
