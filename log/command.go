@@ -3,7 +3,7 @@ package log
 import (
 	"fmt"
 	"os"
-	"skrive/logic"
+	"skrive/data"
 	"time"
 )
 
@@ -30,14 +30,14 @@ func Invoke(arguments []string) error {
 		offsetDescription = fmt.Sprintf(" %d minutes ago", value)
 	}
 
-	dose := logic.Dose{
+	dose := data.Dose{
 		Time:      time,
 		Quantity:  arguments[0],
 		Substance: arguments[1],
 		Route:     arguments[2],
 	}
 
-	if err := dose.Log(); err != nil {
+	if err := data.ApplicationStorage.Append(dose); err != nil {
 		return err
 	}
 

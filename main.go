@@ -4,8 +4,9 @@ import (
 	"fmt"
 	"os"
 
+	"skrive/data"
+	"skrive/data/fs"
 	"skrive/log"
-	"skrive/logic"
 	"skrive/startMenu"
 
 	tea "github.com/charmbracelet/bubbletea"
@@ -29,28 +30,33 @@ func main() {
 		os.Exit(0)
 	}
 
-	err := logic.Setup(*fileArg)
+	data.ApplicationStorage = initialiseStorageInterface()
 
-	if err == nil && subcommand != nil {
+	if subcommand != nil {
 		handleSubcommands()
 	}
 
-	if err == nil {
-		var model tea.Model
-		if subcommand != nil && *subcommand == "log" {
-			model, _ = log.InitializeModel(func() (tea.Model, tea.Cmd) {
-				return model, tea.Quit
-			})
-		} else {
-			model = startMenu.InitializeModel()
-		}
-
-		_, err = tea.
-			NewProgram(model).
-			Run()
+	var model tea.Model
+	if subcommand != nil && *subcommand == "log" {
+		model, _ = log.InitializeModel(func() (tea.Model, tea.Cmd) {
+			return model, tea.Quit
+		})
+	} else {
+		model = startMenu.InitializeModel()
 	}
 
+	_, err := tea.
+		NewProgram(model).
+		Run()
+
 	exitIfError(err)
+}
+
+func initialiseStorageInterface() data.Storage {
+	// There is currently only one type of storage
+	p, err := fs.GetPath(*fileArg)
+	exitIfError(err)
+	return fs.FsStorage{Path: *p}
 }
 
 func handleSubcommands() {

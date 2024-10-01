@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"strconv"
 
-	"skrive/logic"
+	"skrive/data"
 	"skrive/wrapper"
 
 	"github.com/charmbracelet/bubbles/help"
@@ -16,7 +16,7 @@ import (
 
 type model struct {
 	returnToStart func() (tea.Model, tea.Cmd)
-	doses         []logic.Dose
+	doses         []data.Dose
 	err           error
 
 	loadingIndicator spinner.Model
@@ -29,9 +29,9 @@ func InitializeModel(returnToStart func() (tea.Model, tea.Cmd)) (tea.Model, tea.
 	loadingIndicator := spinner.New()
 	loadingIndicator.Spinner = spinner.Dot
 
-	doseTable := createTable(make([]logic.Dose, 0))
+	doseTable := createTable(make([]data.Dose, 0))
 
-	var doses []logic.Dose = nil
+	var doses []data.Dose = nil
 	var err error = nil
 
 	help := help.New()
@@ -52,7 +52,7 @@ func (m model) Init() tea.Cmd {
 	return tea.Batch(load, m.loadingIndicator.Tick)
 }
 
-func getTableRows(doses []logic.Dose) []table.Row {
+func getTableRows(doses []data.Dose) []table.Row {
 	rows := make([]table.Row, len(doses))
 
 	for i, dose := range doses {
@@ -68,7 +68,7 @@ func getTableRows(doses []logic.Dose) []table.Row {
 	return rows
 }
 
-func createTable(doses []logic.Dose) table.Model {
+func createTable(doses []data.Dose) table.Model {
 	columns := []table.Column{
 		{Title: "#", Width: 4},
 		{Title: "Time", Width: 20},
@@ -99,7 +99,7 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 					m.doseTable.SelectedRow()[0],
 				)
 
-				return m, remove(m.doses, index-1)
+				return m, remove(m.doses[index-1].Id, m.doses)
 			}
 		case key.Matches(msg, keys.Help):
 			m.help.ShowAll = !m.help.ShowAll
